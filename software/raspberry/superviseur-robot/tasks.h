@@ -64,8 +64,17 @@ private:
     /**********************************************************************/
     ComMonitor monitor;
     ComRobot robot;
+    Camera camera;
+    int CompteurPosition=0;
     int robotStarted = 0;
+    int robotStartedW= 0;
     int move = MESSAGE_ROBOT_STOP;
+    int CompteurPing = 0;
+    bool statutOpenCamera= false;
+    bool StatutArena=0;
+    bool GrabPosition=false;
+    bool ArenaExist = false;
+    Arena arenaConfirmed;
     
     /**********************************************************************/
     /* Tasks                                                              */
@@ -76,15 +85,29 @@ private:
     RT_TASK th_openComRobot;
     RT_TASK th_startRobot;
     RT_TASK th_move;
-    
+    RT_TASK th_battery;
+    RT_TASK th_cameraStart;
+    RT_TASK th_cameraStop;
+    RT_TASK th_cameraSendImage;
+    RT_TASK th_FindArena;
+    RT_TASK th_ConfirmInfirm;
+    RT_TASK th_MonitorLost;
+    RT_TASK th_MessageWatchdog;
+    RT_TASK th_startRobotWatchdog;
+    RT_TASK th_PingRobot;
+    RT_TASK th_RobotLost;
     /**********************************************************************/
     /* Mutex                                                              */
     /**********************************************************************/
     RT_MUTEX mutex_monitor;
     RT_MUTEX mutex_robot;
     RT_MUTEX mutex_robotStarted;
+    RT_MUTEX mutex_robotStartedW;
     RT_MUTEX mutex_move;
-
+    RT_MUTEX mutex_camera;
+    RT_MUTEX mutex_position;
+    RT_MUTEX mutex_arena;
+    RT_MUTEX mutex_CompteurPing;
     /**********************************************************************/
     /* Semaphores                                                         */
     /**********************************************************************/
@@ -92,6 +115,16 @@ private:
     RT_SEM sem_openComRobot;
     RT_SEM sem_serverOk;
     RT_SEM sem_startRobot;
+    RT_SEM sem_Battery;
+    RT_SEM sem_startCamera;
+    RT_SEM sem_startCameraSend;
+    RT_SEM sem_stopCamera;
+    RT_SEM sem_findArena;
+    RT_SEM sem_ArenaCameraConfirm;
+    RT_SEM sem_MonitorLost;
+    RT_SEM sem_startRobotWatchdog;
+    RT_SEM sem_RobotLost;
+
 
     /**********************************************************************/
     /* Message queues                                                     */
@@ -132,6 +165,61 @@ private:
      */
     void MoveTask(void *arg);
     
+     /**
+     * @brief Battery State.
+     */
+    void BatteryState(void *arg);
+    
+     /**
+     * @brief Open Camera.
+     */
+    void OpenCamera(void *arg);
+    
+    /**
+     * @brief Close Camera.
+     */
+    void CloseCamera(void *arg);
+    
+    /**
+     * @brief Display Image.
+     */
+    void DisplayImagePosition(void *arg);
+    
+    /**
+     * @brief Find Arena.
+     */
+    void TaskFindArena(void *arg);
+
+    /**
+     * @brief Confirm or Infirm Arena.
+     */
+    void CameraConfirmInfirm(void *arg);
+    
+    /**
+     * @brief Lost Connection With Monitor.
+     */
+    void LostConnectionWithMonitor(void *arg);
+    
+    /**
+     * @brief Send the message for the Watchdog.
+     */
+    void SendWatchdogMessage(void *arg);
+    
+    /**
+     * @brief Start robot with Watchdog.
+     */
+    void StartRobotTaskWatchdog(void *arg);
+    
+    /**
+     * @brief Checking if the robot is still connected.
+     */
+    void SendPingRobot(void *arg);
+    
+    /**
+     * @brief Lost Connection With Robot.
+     */
+    void LostConnectionWithRobot(void *arg);
+    
     /**********************************************************************/
     /* Queue services                                                     */
     /**********************************************************************/
@@ -152,4 +240,3 @@ private:
 };
 
 #endif // __TASKS_H__ 
-
